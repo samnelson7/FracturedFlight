@@ -4942,6 +4942,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &574769906 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6461815156141371260, guid: 3685a352dc721794b8f7dc4028b665ae, type: 3}
+  m_PrefabInstance: {fileID: 6498381184054055087}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31d4b4bfb84e68d46bedf12565a6bb08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &579685171
 GameObject:
   m_ObjectHideFlags: 0
@@ -18071,23 +18082,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1784331895 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6435028484448701813, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-  m_PrefabInstance: {fileID: 2674821044532047512}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1784331899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1784331895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd8956511aeaf7949925d32a832a2144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1792107777 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6085629521877003746, guid: 87e503ed7e24b8a43bf022d678dbb092, type: 3}
@@ -21966,23 +21960,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.4333801, y: 3.4799213}
   m_EdgeRadius: 0
---- !u!1 &2106519413 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 289586621865529205, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-  m_PrefabInstance: {fileID: 2674821044532047512}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2106519416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2106519413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd8956511aeaf7949925d32a832a2144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2127993237
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22312,18 +22289,6 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 543881087660969876, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-      propertyPath: m_Size.x
-      value: 14.812361
-      objectReference: {fileID: 0}
-    - target: {fileID: 543881087660969876, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-      propertyPath: m_Offset.x
-      value: 2.228406
-      objectReference: {fileID: 0}
-    - target: {fileID: 543881087660969876, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1637301826947714869, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0
@@ -22384,17 +22349,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 512524164435220018, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 289586621865529205, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2106519416}
-    - targetCorrespondingSourceObject: {fileID: 6435028484448701813, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1784331899}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 612231af8fbed8043a59c04b725c84f4, type: 3}
 --- !u!1001 &3004546878727063429
 PrefabInstance:
@@ -22606,6 +22564,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1627352572375618862, guid: 3685a352dc721794b8f7dc4028b665ae, type: 3}
+      propertyPath: timer
+      value: 
+      objectReference: {fileID: 574769906}
     - target: {fileID: 3006939261443851877, guid: 3685a352dc721794b8f7dc4028b665ae, type: 3}
       propertyPath: m_Name
       value: GameUICanvas

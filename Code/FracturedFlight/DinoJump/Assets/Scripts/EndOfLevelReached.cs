@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,6 +18,8 @@ public class EndOfLevelReached : MonoBehaviour
         animator2.SetBool("EndReached", true);
         animator3.SetBool("EndReached", true);
         UIManager.instance.disablePlayerMovement();
+        UIManager.instance.timer.StopTimer();
+        UIManager.instance.timer.SaveFastestCompletionTime();
         SaveLevelCollectibles();
     }
     public void SaveLevelCollectibles()

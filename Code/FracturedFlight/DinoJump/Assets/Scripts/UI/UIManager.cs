@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+    public StopwatchTimer timer;
     public static UIManager instance;
     public GameObject missingEggIcon1;
     public GameObject missingEggIcon2;
@@ -25,6 +24,7 @@ public class UIManager : MonoBehaviour
     private bool egg1Found = false;
     private bool egg2Found = false;
     private bool egg3Found = false;
+    private bool playerKilled = false;
 
     private void Start()
     {
@@ -76,6 +76,9 @@ public class UIManager : MonoBehaviour
     }
     public void killed(string causeOfDeath)
     {
+        playerKilled = true;
+        PlayerMovement player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
+        player.killed();
         PlayAgain.SetActive(true);
         ExitStage.SetActive(true);
         TMP_Text text = YouDied.GetComponentInChildren<TMP_Text>();
@@ -95,7 +98,6 @@ public class UIManager : MonoBehaviour
         ExitStage.SetActive(true);
         LevelComplete.SetActive(true);
     }
-
     public string getCollectablesFound()
     {
         string value = "";

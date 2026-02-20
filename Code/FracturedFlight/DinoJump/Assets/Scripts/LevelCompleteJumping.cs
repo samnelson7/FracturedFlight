@@ -23,13 +23,13 @@ public class LevelCompleteJumping : MonoBehaviour
             grounded = false;
             animator.SetBool ("Grounded", grounded);
             complete = true;
-            rigidBody2d.velocity = new Vector2(0,35);
+            rigidBody2d.linearVelocity = new Vector2(0,35);
         }
         if (complete && motionlessCounter >= 1.5)
         {
             grounded = false;
             animator.SetBool("Grounded", grounded);
-            rigidBody2d.velocity = new Vector2(0, 35);
+            rigidBody2d.linearVelocity = new Vector2(0, 35);
             motionlessCounter = 0;
         }
         if (complete) motionlessCounter += Time.deltaTime;

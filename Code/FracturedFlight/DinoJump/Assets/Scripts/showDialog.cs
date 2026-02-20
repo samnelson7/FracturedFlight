@@ -1,11 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 public class showDialog : MonoBehaviour
 {
-    private bool dialogShown = false;
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!dialogShown) DialogManager.instance.showDialog();
+        DialogManager.instance.showDialog();
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        DialogManager.instance.hideDialog();
     }
 }

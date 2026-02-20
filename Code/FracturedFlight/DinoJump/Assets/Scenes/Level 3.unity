@@ -15539,9 +15539,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5116459800733331557, guid: 6b386a3b8e5c3bf40b585281a2fe12e5, type: 3}
       propertyPath: m_text
-      value: Hey champ. I could crawl outta this place faster than you seem to move.
-        I almost hit my head on that platform behind me but I seemed to pass right
-        through it!
+      value: Hey champ. I could crawl outta this place faster than you. I almost
+        hit my head on that platform behind me but I seemed to pass right through
+        it!
       objectReference: {fileID: 0}
     - target: {fileID: 7971588919971620594, guid: 6b386a3b8e5c3bf40b585281a2fe12e5, type: 3}
       propertyPath: m_Name

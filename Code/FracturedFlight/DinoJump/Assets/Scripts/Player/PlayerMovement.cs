@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +10,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Jump Buffer")]
     [SerializeField] private float bufferTime = 0.1f;
-    private float bufferTimeRemaining = 0;
+    private float bufferJumpTimeRemaining = 0;
+    private float bufferDropTimeRemaining = 0;
 
     [Header("Multiple Jumps")]
     [SerializeField] private int extraJumps = 0;
@@ -23,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
 
     BoxCollider2D playerCollider;
 
+    private TurtleEnemy ridingTurtleEnemy;
+
     private bool grounded = true;
     private bool isOnPlatform = false;
     public bool playerCanMove = true;
@@ -31,11 +32,20 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D playerBody;
     private bool flightEnabled = false;
     private bool playerMoved = false;
+    private bool playerKilled = false;
     // vars for platform falling
     private float dropTimer = 0f;
     public float dropDuration = 0.5f;
+
+    public static PlayerMovement instance { get; private set; } // singleton player instance
     private void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
         playerBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         playerCollider = GetComponent<BoxCollider2D>();
@@ -44,46 +54,78 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
+        float horizontalInput = getHorizontalInput();
         animator.SetBool("Running", horizontalInput != 0);
         animator.SetBool("Grounded", grounded);
+        
+        // Start timer and remove arrow key visuals
+        if (!playerMoved && (
+            Input.GetKeyDown(KeyCode.LeftArrow) ||
+            Input.GetKeyDown(KeyCode.A) ||
+            Input.GetKeyDown(KeyCode.RightArrow) ||
+            Input.GetKeyDown(KeyCode.D)))
+        {
+            playerMoved = true;
+            if (UIManager.instance.timer != null) UIManager.instance.timer.StartTimer();
+        }
+
         if (!playerCanMove)
         {
             grounded = true;
-            playerBody.velocity = new Vector2(playerBody.velocity.x/1.01f, playerBody.velocity.y);
+            playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x/1.01f, playerBody.linearVelocity.y);
+            if (Input.GetKeyDown(KeyCode.Space)) // player beat the level, repurpose space bar to "Next Level"
+            {
+                if (playerKilled)
+                { // reload same scene if player was killed
+                    SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name);
+                }
+                else
+                { // else level complete, move to next level
+                    MenuSelector menuSelector = new MenuSelector();
+                    menuSelector.SceneToLoad = "Next";
+                    menuSelector.OpenScene();
+                }
+            }
             return;
         }
-        playerBody.velocity = new Vector2(horizontalInput * runSpeed, playerBody.velocity.y);
-        if (playerBody.velocity.y < -200) UIManager.instance.killed("You fell too fast and got dizzy");
-        if (horizontalInput > 0)
+        if (playerCanMove)
         {
-            playerMoved = true;
+            playerBody.linearVelocity = new Vector2(horizontalInput * runSpeed, playerBody.linearVelocity.y);
+        }
+        if (playerBody.linearVelocity.y < -200) UIManager.instance.killed("You fell too fast and got dizzy");
+        if (horizontalInput > 0f)
+        {
             transform.localScale = new Vector2(1f, 1f);
         }
-        else if (horizontalInput < 0)
+        else if (horizontalInput < 0f)
         {
-            playerMoved = true;
             transform.localScale = new Vector2(-1f,1f);
         }
         else // horizontal input is 0
         {
-            playerBody.velocity = new Vector2(playerBody.velocity.x / 30f, playerBody.velocity.y); // dampen horizontal movement when not pressing left/right
+            if (playerCanMove)
+            {
+                playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x / 30f, playerBody.linearVelocity.y); // dampen horizontal movement when not pressing left/right
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
         {
             if (flightEnabled || grounded || coyoteCounter >= 0 || jumpCounter > 0) Jump();
-            else bufferTimeRemaining = bufferTime;
+            else
+            {
+                bufferJumpTimeRemaining = bufferTime;
+            }
         }
         // allow short hops
-        if (Input.GetKeyUp(KeyCode.UpArrow) && playerBody.velocity.y > 0)
+        if ((Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.W)) && playerBody.linearVelocity.y > 0)
         {
-            playerBody.velocity = new Vector2(playerBody.velocity.x, playerBody.velocity.y / 2f);
+            playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x, playerBody.linearVelocity.y / 2f);
         }
-        if (playerBody.velocity.y > 35f && !Input.GetKey(KeyCode.UpArrow))
+        if (playerBody.linearVelocity.y > 35f && !(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space)))
         {
-            // Player is going up fast but not holding Up — apply damping
-            playerBody.velocity = new Vector2(playerBody.velocity.x, playerBody.velocity.y * 0.8f);
+            // Player is going up fast but not holding Up ï¿½ apply damping
+            playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x, playerBody.linearVelocity.y * 0.8f);
         }
         if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
         {
@@ -97,15 +139,23 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             coyoteCounter -= Time.deltaTime;
-            bufferTimeRemaining -= Time.deltaTime;
+            bufferJumpTimeRemaining -= Time.deltaTime;
+            bufferDropTimeRemaining -= Time.deltaTime;
         }
         // platform falling
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            Drop();
+            if (grounded)
+            {
+                Drop();
+            }
+            else
+            {
+                bufferDropTimeRemaining = bufferTime;
+            }
         }
 
-        if (playerBody.velocity.y < -5) grounded = false;
+        if (playerBody.linearVelocity.y < -5) grounded = false;
         if (playerMoved) UIManager.instance.playerMoved();
     }
     private IEnumerator temporarilyIgnorePlatforms(float disableTime)
@@ -131,7 +181,7 @@ public class PlayerMovement : MonoBehaviour
     {
         jumpCounter--;
         coyoteCounter = 0;
-        playerBody.velocity = new Vector2(playerBody.velocity.x, jumpSpeed);
+        playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x, jumpSpeed);
         grounded = false;
     }
 
@@ -152,14 +202,25 @@ public class PlayerMovement : MonoBehaviour
                         currentPlatform = collision.gameObject;
                     }
 
-                    if (bufferTimeRemaining >= 0)
+                    if (bufferJumpTimeRemaining > 0)
                     {
                         Jump();
+                    }
+
+                    if (bufferDropTimeRemaining > 0)
+                    {
+                        Drop();
                     }
 
                     break;
                 }
             }
+        }
+        // logic for moving on enemies' backs
+        var enemy = collision.collider.GetComponent<TurtleEnemy>();
+        if (enemy != null)
+        {
+            ridingTurtleEnemy = enemy;
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -167,6 +228,47 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Platform"))
         {
             isOnPlatform = false;
+        }
+        if (collision.collider.GetComponent<TurtleEnemy>() == ridingTurtleEnemy)
+        {
+            ridingTurtleEnemy = null;
+        }
+    }
+    public void killed()
+    {
+        playerKilled = true;
+        playerCanMove = false;
+    }
+    private IEnumerator EnablePlayerMovementAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        playerCanMove = true;
+    }
+
+    void Start()
+    {
+        playerCanMove = false;
+        StartCoroutine(EnablePlayerMovementAfterDelay());
+    }
+    float getHorizontalInput()
+    {
+        if (playerCanMove)
+        {
+            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) return -1f;
+            else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) return 1f;
+            else return 0f;
+        }
+        return playerBody.linearVelocity.x; // if player movement is disabled, just let the player continue moving
+    }
+    public void setGrounded(bool isGrounded)
+    {
+        grounded = isGrounded;
+    }
+    void FixedUpdate()
+    {
+        if (ridingTurtleEnemy != null)
+        {
+            playerBody.position += (Vector2)ridingTurtleEnemy.platformVelocity * Time.fixedDeltaTime;
         }
     }
 }

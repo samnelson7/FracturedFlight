@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MenuSelector : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class MenuSelector : MonoBehaviour
     [SerializeField] public GameObject egg2Collected;
     [SerializeField] public GameObject egg3Collected;
     public HoverColorChange hoverColorChange;
+    public TextMeshProUGUI FastestTimeAllEggs;
+    public TextMeshProUGUI FastestTimeNoEggs;
     private void Start()
     {
         if (egg1Collected != null && egg2Collected != null && egg3Collected != null) 
@@ -17,6 +20,7 @@ public class MenuSelector : MonoBehaviour
             egg2Collected.SetActive(false);
             egg3Collected.SetActive(false);
             loadCollectables();
+            loadFastestTimes();
         }
     }
     public void OpenScene()
@@ -24,7 +28,8 @@ public class MenuSelector : MonoBehaviour
         if (SceneToLoad == "")
         {
             SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name);
-        }else if (SceneToLoad == "Next")
+        }
+        else if (SceneToLoad == "Next")
         {
             string currentLevelName = SceneManager.GetActiveScene().name;
             string[] parts = currentLevelName.Split(' ');
@@ -40,7 +45,7 @@ public class MenuSelector : MonoBehaviour
         }
         else if (SceneToLoad == "Exit")
         {
-            Application.Quit();
+            Screen.fullScreen = false;
         }
         else
         {
@@ -50,10 +55,10 @@ public class MenuSelector : MonoBehaviour
     public void loadCollectables()
     {
         string[] parts = SceneToLoad.Split(' ');
-        int currentLevelNumber = int.Parse(parts[parts.Length - 1]);
-        bool previousLevelCompleted = isPreviousLevelCompleted(currentLevelNumber);
+        int levelNumber = int.Parse(parts[parts.Length - 1]);
+        bool previousLevelCompleted = isPreviousLevelCompleted(levelNumber);
         if (!previousLevelCompleted) setLevelButtonState(false);
-        string key = "Level_" + currentLevelNumber + "_Collectibles"; // e.g., "Level_1_Collectibles"
+        string key = "Level_" + levelNumber + "_Collectibles"; // e.g., "Level_1_Collectibles"
         string collectedEggs = PlayerPrefs.GetString(key, "000");
         Debug.Log($"After Save - Key: {key}, CollectedEggs: {collectedEggs}");
         for (int i = 0; i < 3; i++)
@@ -97,5 +102,26 @@ public class MenuSelector : MonoBehaviour
                 }
             }
         }
+    }
+    public void loadFastestTimes()
+    {
+        string[] parts = SceneToLoad.Split(' ');
+        int levelNumber = int.Parse(parts[parts.Length - 1]);
+        string anyPercentKey = "Level_" + levelNumber + "_Any%"; // e.g., "Level_1_Any%"
+        string allEggsKey = "Level_" + levelNumber + "_All"; // e.g., "Level_1_All"
+
+        float fastestAnyPercent = PlayerPrefs.GetFloat(anyPercentKey, 0);
+        float fastestAllEggs = PlayerPrefs.GetFloat(allEggsKey, 0);
+
+        FastestTimeNoEggs.text = FormatTime(fastestAnyPercent);
+        FastestTimeAllEggs.text = FormatTime(fastestAllEggs);
+    }
+    public string FormatTime(float time)
+    {
+        int minutes = Mathf.FloorToInt(time / 60);
+        int seconds = Mathf.FloorToInt(time % 60);
+        int milliseconds = Mathf.FloorToInt((time * 100) % 100);
+
+        return string.Format("{0:00}:{1:00}:{2:00}", minutes, seconds, milliseconds);
     }
 }

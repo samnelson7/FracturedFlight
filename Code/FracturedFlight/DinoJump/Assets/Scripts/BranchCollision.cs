@@ -13,12 +13,20 @@ public class BranchCollision : MonoBehaviour
     private float degreesRotated = 0;
     public int rotationDirection = 1;
     public float reboundSpeed = 1;
+    public bool sendPlayerSideways = false;
     private void OnCollisionEnter2D(Collision2D collision)
     {
         GetComponent<Collider2D>().enabled = !disableCollider;
         Rigidbody2D playerBody = collision.gameObject.GetComponent<Rigidbody2D>();
-        playerBody.velocity = new Vector2(playerBody.velocity.x, reboundSpeed*35);
-        objectHit = true;        
+        if (sendPlayerSideways)
+        {
+            StartCoroutine(launchSideways(playerBody));
+        }
+        else
+        {
+            playerBody.linearVelocity = new Vector2(playerBody.linearVelocity.x, reboundSpeed * 35);
+        }
+        objectHit = true;
     }
     private void Update()
     {
@@ -33,5 +41,15 @@ public class BranchCollision : MonoBehaviour
             degreesRotated = 0;
             objectHit = false;
         }
+    }
+    private IEnumerator launchSideways(Rigidbody2D playerBody)
+    {
+        GetComponent<Collider2D>().enabled = false;
+        PlayerMovement.instance.playerCanMove = false;
+        PlayerMovement.instance.setGrounded(false);
+        playerBody.linearVelocity = new Vector2(-250f * reboundSpeed, 35f);
+        yield return new WaitForSeconds(0.4f);
+        PlayerMovement.instance.playerCanMove = true;
+        GetComponent<Collider2D>().enabled = true;
     }
 }
